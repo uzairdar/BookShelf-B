@@ -15,7 +15,21 @@ router.route("/:uid").get((req, res) => {
       return res.json({ error });
     });
 });
-
+router.route("/deleteShelf/:sid").delete((req, res) => {
+  console.log("here i am");
+  const sid = req.params.sid;
+  Shelf.findByIdAndDelete(sid)
+    .then((shelf) => {
+      if (shelf) {
+        return res.json({ shelf, message: "shelf deleted successfully" });
+      } else {
+        return res.json({ message: "shelf not found for given id" });
+      }
+    })
+    .catch((error) => {
+      res.json({ error });
+    });
+});
 router.route("/addbook").post((req, res) => {
   const {
     title,
@@ -52,6 +66,30 @@ router.route("/addbook").post((req, res) => {
     .catch((error) => {
       console.log("error", error);
       res.status(400).json({ message: "Book cannot be added!", error });
+    });
+});
+router.route("/update/:sid").post((req, res) => {
+  const { sid } = req.params;
+  const { title, authorname, publicationH, publicationD, genre, publicationY } =
+    req.body;
+  console.log("update received", req.body);
+  Shelf.findByIdAndUpdate(
+    sid,
+    {
+      title,
+      authorname,
+      publicationH,
+      publicationD,
+      genre,
+      publicationY,
+    },
+    { new: true }
+  )
+    .then((shelf) => {
+      res.json({ message: "Shelf updated successfully", shelf });
+    })
+    .catch((error) => {
+      res.json({ error });
     });
 });
 router.route("/changeStatus/:sid").post((req, res) => {
